@@ -1,0 +1,65 @@
+version: 1
+description: Utilities to encode and decode data in different formats, like base64, URL encode, etc...
+help: |
+  The purpose of this plugin is to collect in one place all the usual encoder and decoders.
+  These are some examples:
+  
+  Encode string in base64 format
+  $ jarvis codec base64 encode "This is a string"
+  
+  Decode string in base64 format
+  $ jarvis codec base64 decode "dGhpcyBpcyBhIHN0cmluZw=="
+
+  URL encode string
+  $ jarvis codec url encode "This is a string"
+commands:
+  base64:
+    description: Encoder and decoder of base64 string and files
+    commands:
+      encode:
+        description: Encodes a string to base64 format
+        parameters:
+          - name: STRING
+            prompt: String to base64 encode
+            description: String to encode. It will be prompted if the string is missing
+        exec:
+          python3 -c "import base64; import sys; print(base64.b64encode(sys.argv[1].encode()).decode())" "${STRING}"
+      decode:
+        description: Decode a string from base64 format
+        parameters:
+          - name: BASE64_STRING
+            prompt: Base64 string to decode
+            description: Base64 string to decode. It will be prompted if the string is missing
+        exec:
+          python3 -c "import base64; import sys; sys.stdout.buffer.write(base64.b64decode(sys.argv[1].encode()))" "${BASE64_STRING}"
+      file:
+        commands:
+          encode:
+            description: Encodes a file to base64 format
+            parameters:
+              - name: FILENAME
+                description: File to encode
+            exec:
+              ${JARVIS_PLUGIN_DIR}/codec.py base64_encode_file ${FILENAME}
+          decode:
+            description: Decodes a file from base64 format
+            parameters:
+              - name: FILENAME
+                description: File to decode
+            exec:
+              ${JARVIS_PLUGIN_DIR}/codec.py base64_decode_file ${FILENAME}
+
+  url:
+    commands:
+      encode:
+        parameters:
+          - name: STRING
+            prompt: String to URL encode
+        exec:
+          python3 -c "import urllib.parse; import sys; print(urllib.parse.quote(sys.argv[1]))" "${STRING}"
+      decode:
+        parameters:
+          - name: STRING
+            prompt: String to URL decode
+        exec:
+          python3 -c "import urllib.parse; import sys; print(urllib.parse.unquote(sys.argv[1]))" "${STRING}"
